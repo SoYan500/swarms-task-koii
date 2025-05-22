@@ -1,73 +1,43 @@
-# Summarizer Task Tests
+# Node Component Test Configuration
 
-This directory contains end-to-end tests for the summarizer task using the Prometheus test framework.
-
-## Structure
-
-```
-tests/
-├── config.yaml           # Test configuration
-├── workers.json         # Worker configuration
-├── data/               # Test data
-│   ├── todos.json     # Sample todo items
-│   └── issues.json    # Sample issues
-├── stages/            # Test stages implementation
-├── e2e.py            # Test runner script
-└── steps.py          # Test steps definition
-```
+## Overview
+This directory contains test configurations and utilities for the Node component.
 
 ## Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
+- Access to required environment variables
 
-1. Install the test framework:
+## Test Setup
 
+### Environment Configuration
+1. Copy `.env.example` to `.env`
+2. Fill in required environment variables
+3. Ensure all dependencies are installed
+
+### Running Tests
 ```bash
-pip install -e test-framework/
+# Install dependencies
+npm install
+
+# Run all tests
+npm test
+
+# Run specific test suite
+npm test -- path/to/specific/test
 ```
 
-2. Set up environment variables in `.env`:
+## Test Types
+- Unit Tests: Verify individual function/module behavior
+- Integration Tests: Check interactions between components
+- End-to-End Tests: Validate complete workflow scenarios
 
-```
-ANTHROPIC_API_KEY=your_test_key
-GITHUB_USERNAME=your_test_username
-GITHUB_TOKEN=your_test_token
-```
+## Troubleshooting
+- Ensure all environment variables are correctly set
+- Check network connectivity
+- Verify dependency versions
 
-## Running Tests
-
-To run the tests:
-
-```bash
-python -m tests.e2e
-```
-
-To force reset databases before running:
-
-```bash
-python -m tests.e2e --reset
-```
-
-## Test Flow
-
-1. API Key Validation
-
-   - Validates Anthropic API key
-
-2. GitHub Validation
-
-   - Validates GitHub credentials
-
-3. Todo Management
-
-   - Fetches todos for each worker
-   - Generates summaries
-   - Submits results
-
-4. Audit Process
-   - Workers audit each other's submissions
-
-## Adding New Tests
-
-1. Create a new stage in `stages/`
-2. Add stage to `stages/__init__.py`
-3. Add test step in `steps.py`
-4. Update test data in `data/` if needed
+## Configuration Files
+- `jest.config.js`: Jest testing configuration
+- `tsconfig.json`: TypeScript compiler settings
+- `.env.example`: Example environment configuration
