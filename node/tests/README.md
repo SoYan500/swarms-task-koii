@@ -1,73 +1,142 @@
-# Summarizer Task Tests
+# Node Test Configuration Guide
 
-This directory contains end-to-end tests for the summarizer task using the Prometheus test framework.
+## Overview
+This document provides comprehensive guidance for test configuration, explaining the testing infrastructure, configuration strategies, and best practices for the Swarms Node project.
 
-## Structure
+## Test Framework Configuration
 
+### Jest Configuration Explained
+```javascript
+module.exports = {
+  // Preset enables TypeScript and Jest integration
+  preset: 'ts-jest',
+
+  // Specifies the test environment (Node.js)
+  testEnvironment: 'node',
+
+  // Defines root directories for test discovery
+  roots: ['<rootDir>'],
+
+  // Transformation rules for TypeScript files
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest'
+  },
+
+  // Regex pattern to identify test files
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
+
+  // File extensions recognized as modules
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
+}
 ```
-tests/
-├── config.yaml           # Test configuration
-├── workers.json         # Worker configuration
-├── data/               # Test data
-│   ├── todos.json     # Sample todo items
-│   └── issues.json    # Sample issues
-├── stages/            # Test stages implementation
-├── e2e.py            # Test runner script
-└── steps.py          # Test steps definition
-```
 
-## Prerequisites
+#### Configuration Impact
+- `preset: 'ts-jest'`: Enables TypeScript support without separate compilation step
+- `testEnvironment: 'node'`: Ensures tests run in Node.js context
+- `roots`: Helps Jest locate test files efficiently
+- `transform`: Converts TypeScript files to JavaScript for testing
+- `testRegex`: Defines which files are considered tests
+- `moduleFileExtensions`: Supports multiple file types in tests
 
-1. Install the test framework:
+### Environment Configuration Best Practices
 
+#### Environment Variables
 ```bash
-pip install -e test-framework/
+# Recommended .env.test configuration
+NODE_ENV=test           # Explicit test environment
+LOG_LEVEL=debug         # Detailed logging during tests
+MOCK_EXTERNAL_SERVICES=true  # Isolate tests from external dependencies
+
+# API and Authentication
+TEST_API_KEY=test_key_12345
+TEST_BASE_URL=http://localhost:3000
 ```
 
-2. Set up environment variables in `.env`:
+### Example Test Configuration Scenarios
 
+#### Mocking External Dependencies
+```typescript
+// Example of dependency mocking
+jest.mock('@_koii/namespace-wrapper', () => ({
+  // Provide controlled mock implementations
+  storeGet: jest.fn(),
+  storeSet: jest.fn(),
+  getSubmitterAccount: jest.fn()
+}));
 ```
-ANTHROPIC_API_KEY=your_test_key
-GITHUB_USERNAME=your_test_username
-GITHUB_TOKEN=your_test_token
-```
 
-## Running Tests
-
-To run the tests:
-
+#### Performance and Coverage Configuration
 ```bash
-python -m tests.e2e
+# Running tests with performance and coverage tracking
+npm test -- --maxWorkers=50% --coverage
 ```
 
-To force reset databases before running:
+## Test Execution Strategies
 
+### Running Tests
 ```bash
-python -m tests.e2e --reset
+# Standard test execution
+npm test
+
+# Watch mode for development
+npm test -- --watch
+
+# Generate coverage report
+npm run test:coverage
+
+# Run specific test suite
+npm test -- tests/specific-module.test.ts
 ```
 
-## Test Flow
+## Advanced Configuration Techniques
 
-1. API Key Validation
+### Handling Different Test Environments
+- Use `.env.test` for test-specific configurations
+- Implement environment-specific mocking
+- Isolate test data and state
 
-   - Validates Anthropic API key
+### Security Considerations
+- Never use production credentials in tests
+- Implement strict input validation
+- Use mock authentication mechanisms
 
-2. GitHub Validation
+## Troubleshooting
 
-   - Validates GitHub credentials
+### Common Configuration Issues
+1. Dependency version mismatches
+2. Incorrect file path configurations
+3. Incomplete environment variable setup
 
-3. Todo Management
+### Debugging Tips
+- Use `--verbose` flag for detailed output
+- Leverage Jest's debugging capabilities
+- Check for proper module mocking
 
-   - Fetches todos for each worker
-   - Generates summaries
-   - Submits results
+## Contributing Guidelines
 
-4. Audit Process
-   - Workers audit each other's submissions
+### Test Writing Principles
+- Write focused, single-responsibility tests
+- Cover both positive and negative scenarios
+- Maintain high readability
+- Ensure tests are independent and repeatable
 
-## Adding New Tests
+### Performance Optimization
+- Minimize test execution time
+- Use lightweight mocking strategies
+- Parallelize test execution where possible
 
-1. Create a new stage in `stages/`
-2. Add stage to `stages/__init__.py`
-3. Add test step in `steps.py`
-4. Update test data in `data/` if needed
+## Continuous Integration
+
+### CI/CD Test Configuration
+- Automatic test runs on pull requests
+- Coverage threshold enforcement
+- Performance benchmarking
+- Security vulnerability scanning
+
+## Maintenance
+
+### Regular Review Checklist
+- Update test dependencies
+- Review and refactor test configurations
+- Assess test coverage periodically
+- Align tests with current system architecture

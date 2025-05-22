@@ -1,160 +1,150 @@
-# Middle Server for Swarm Task Processing
+# Coordinator Middle Server Test Configuration Guide
 
-This server acts as a middleware for processing swarm tasks, managing job status, and storing results.
+## Overview
+This document provides an in-depth explanation of test configuration, strategies, and best practices for the Coordinator Middle Server.
 
-## Recent Updates
-- Only Swarm APIs are supported; all legacy endpoints have been removed.
-- Test scripts in `deprecated_unit_tests/` demonstrate usage of the new Swarm APIs.
-- Comprehensive API documentation and data models are provided below.
+## Test Framework Configuration
 
-## Features
+### Jest Configuration Detailed Breakdown
+```javascript
+module.exports = {
+  // TypeScript preset for seamless integration
+  preset: 'ts-jest',
 
-- Swarm job creation and management
-- Status tracking and updates
-- Result storage and retrieval
-- MongoDB integration for data persistence
-- RESTful API endpoints
-- Comprehensive test coverage
+  // Node.js test environment ensures correct runtime context
+  testEnvironment: 'node',
 
-## API Endpoints
+  // Root directories for comprehensive test discovery
+  roots: ['<rootDir>/src/tests'],
 
-### Swarm Jobs
+  // TypeScript transformation settings
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest'
+  },
 
-- `POST /api/swarm/jobs` - Create a new swarm job
-  - Request body: `{ swarm_spec: SwarmSpec, metadata?: Record<string, any> }`
-  - Response: `{ job_id: string, status: string, swarm_spec: SwarmSpec, ... }`
+  // Test file identification pattern
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
 
-- `GET /api/swarm/jobs/:jobId` - Get job details
-  - Response: `{ job_id: string, status: string, swarm_spec: SwarmSpec, ... }`
-
-- `PUT /api/swarm/jobs/:jobId/status` - Update job status
-  - Request body: `{ status: string, progress?: number, error?: string }`
-  - Response: `{ job_id: string, status: string, progress?: number, ... }`
-
-- `POST /api/swarm/jobs/:jobId/result` - Store job result
-  - Request body: `{ output: any, metadata?: Record<string, any> }`
-  - Response: `{ job_id: string, status: string, output: any, ... }`
-
-- `GET /api/swarm/jobs/:jobId/result` - Get job result
-  - Response: `{ job_id: string, output: any, metadata?: Record<string, any>, ... }`
-
-## Data Models
-
-### SwarmSpec
-
-```typescript
-interface SwarmSpec {
-  name: string;
-  description: string;
-  agents: AgentSpec[];
-  max_loops: number;
-  swarm_type: string;
-  task: string;
-  schedule?: ScheduleSpec;
+  // Supported module extensions
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
 }
 ```
 
-### AgentSpec
+#### Configuration Impact Explanation
+- Enables type-safe testing with minimal configuration overhead
+- Provides consistent testing environment across development machines
+- Supports incremental adoption of testing practices
 
-```typescript
-interface AgentSpec {
-  agent_name: string;
-  description: string;
-  model_name: string;
-  max_tokens: number;
-  temperature?: number;
-  top_p?: number;
-  system_prompt?: string;
-}
-```
+### Environment Configuration
 
-### ScheduleSpec
-
-```typescript
-interface ScheduleSpec {
-  type: "sequential" | "parallel";
-  max_parallel?: number;
-}
-```
-
-## Quick Start
-
-For a quick start with a sample job, use the provided script:
-
+#### Recommended .env.test Setup
 ```bash
-./scripts/start-and-test.sh
+# Database Configuration
+MONGODB_TEST_URI=mongodb://localhost:27017/middle-server-test
+MONGODB_CONNECTION_TIMEOUT=5000
+
+# Authentication for Test Environment
+TEST_ADMIN_KEY=test_admin_secret_12345
+TEST_API_KEY=test_api_secret_67890
+
+# Logging and Debugging
+LOG_LEVEL=debug
+ENABLE_TEST_LOGGING=true
+
+# Feature Flags for Testing
+MOCK_EXTERNAL_SERVICES=true
+ENABLE_DETAILED_ERROR_TRACKING=true
 ```
 
-This script will:
-1. Start the server in development mode
-2. Create a sample swarm job
-3. Display the job details
-4. Keep the server running until you press Ctrl+C
+## Testing Strategies
 
-## Setup
+### Dependency Mocking Example
+```typescript
+// Demonstrates controlled test environment setup
+jest.mock('../services/database/database', () => ({
+  connect: jest.fn().mockResolvedValue(mockDatabaseConnection),
+  disconnect: jest.fn()
+}));
+```
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Set environment variables:
-   ```bash
-   MONGODB_URI=mongodb://localhost:27017/middle-server
-   PORT=3000
-   ```
-
-3. Start the server:
-   ```bash
-   npm run dev
-   ```
-
-## Testing
-
-Run tests:
+### Performance and Coverage Configuration
 ```bash
+# Optimize test execution
+npm test -- --maxWorkers=50% --coverage
+```
+
+## Advanced Configuration Techniques
+
+### Test Isolation Principles
+- Use unique database connections for each test
+- Reset state between test runs
+- Implement clean, predictable test data generation
+
+### Security in Testing
+- Generate test-specific credentials
+- Implement role-based access control mocking
+- Validate input sanitization mechanisms
+
+## Execution Strategies
+
+### Running Tests
+```bash
+# Standard test execution
 npm test
+
+# Watch mode for active development
+npm test -- --watch
+
+# Generate comprehensive coverage report
+npm run test:coverage
+
+# Run specific test module
+npm test -- src/tests/specific-module.test.ts
 ```
 
-## Development
+## Troubleshooting
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run linter
+### Common Configuration Challenges
+1. Asynchronous test timing issues
+2. External service dependencies
+3. Complex mocking scenarios
 
-## Test Scripts
+### Debugging Recommendations
+- Use `--verbose` for detailed output
+- Leverage source map support
+- Implement comprehensive logging
 
-See `deprecated_unit_tests/` for migration and legacy test scripts using the new Swarm APIs.
+## Best Practices
 
-## Live Unit Tests
+### Test Design Guidelines
+- Maintain single responsibility in tests
+- Create predictable, reproducible test scenarios
+- Cover edge cases and error conditions
+- Minimize test interdependencies
 
-The `live_unit_tests/` directory contains scripts that exercise the Swarm APIs against a running instance of the middle server. These scripts are intended for manual or integration testing with a live backend (not as part of the automated Jest suite).
+### Performance Optimization
+- Use lightweight mocking strategies
+- Parallelize test execution
+- Minimize external service interactions
 
-### How to Use
+## Continuous Integration
 
-1. **Start the middle server** (in a separate terminal):
-   ```bash
-   npm run dev
-   ```
+### CI/CD Test Configuration
+- Automatic test execution on pull requests
+- Coverage threshold enforcement
+- Performance benchmarking
+- Security vulnerability scanning
 
-2. **Run a live test script** (in another terminal):
-   ```bash
-   npx ts-node live_unit_tests/controllers/createToDoTest.ts
-   npx ts-node live_unit_tests/controllers/createFetchAddPRTest.ts
-   npx ts-node live_unit_tests/utils/signTest.ts
-   ```
+## Maintenance Recommendations
 
-These scripts will make real HTTP requests to the server and print results to the console. They are useful for verifying end-to-end functionality and API compatibility after changes.
+### Periodic Review Checklist
+- Update testing dependencies
+- Refactor test configurations
+- Assess and improve test coverage
+- Align tests with evolving system architecture
 
-## Error Response Conventions
-
-- **Authentication errors** (invalid or missing admin key):
-  - Status codes: `401` (missing), `403` (invalid)
-  - Response body: `{ "message": "..." }`
-
-- **Validation errors** (invalid job spec):
-  - Status code: `400`
-  - Response body: `{ "error": "..." }`
-
-These conventions are enforced and tested in the API test suite. 
+### Contribution Guidelines
+- Follow existing test structure
+- Write clear, descriptive test cases
+- Ensure high readability
+- Maintain comprehensive documentation
