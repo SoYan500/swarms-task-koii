@@ -1,0 +1,28 @@
+{
+    "testEnvironment": {
+        "version": "1.0.0",
+        "supportedPlatforms": ["linux", "macos", "windows"],
+        "requiredSoftware": {
+            "node": ">=16.0.0",
+            "python": ">=3.8.0",
+            "mongodb": ">=4.2.0"
+        },
+        "testRunners": {
+            "node": ["jest", "vitest"],
+            "python": ["pytest", "unittest"],
+            "typescript": ["vitest", "jest"]
+        },
+        "defaultTestConfiguration": {
+            "timeout": 30000,
+            "parallel": true,
+            "coverage": {
+                "enabled": true,
+                "threshold": {
+                    "lines": 80,
+                    "functions": 80,
+                    "branches": 70
+                }
+            }
+        }
+    }
+}
