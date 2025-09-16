@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^1.0.1",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.1.4"
+  }
+}

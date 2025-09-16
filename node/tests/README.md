@@ -1,73 +1,126 @@
-# Summarizer Task Tests
+# Node Tests Documentation
 
-This directory contains end-to-end tests for the summarizer task using the Prometheus test framework.
+## Overview
+Comprehensive test suite for the Node component, covering various aspects of task processing, validation, and integration.
 
-## Structure
+## Test Types
+1. **Unit Tests**: Individual component testing
+2. **Integration Tests**: Cross-component interaction validation
+3. **Workflow Tests**: End-to-end task processing simulation
 
-```
-tests/
-├── config.yaml           # Test configuration
-├── workers.json         # Worker configuration
-├── data/               # Test data
-│   ├── todos.json     # Sample todo items
-│   └── issues.json    # Sample issues
-├── stages/            # Test stages implementation
-├── e2e.py            # Test runner script
-└── steps.py          # Test steps definition
-```
+## Test Configuration
 
-## Prerequisites
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- TypeScript
+- Vitest (primary test runner)
 
-1. Install the test framework:
-
+### Setup
 ```bash
-pip install -e test-framework/
+# Install dependencies
+npm install
+
+# Install dev dependencies
+npm install -D vitest @types/node typescript
 ```
 
-2. Set up environment variables in `.env`:
-
-```
-ANTHROPIC_API_KEY=your_test_key
-GITHUB_USERNAME=your_test_username
-GITHUB_TOKEN=your_test_token
-```
+### Configuration Files
+- `tsconfig.json`: TypeScript compiler configuration
+- `vitest.config.ts`: Vitest configuration
+- `tests/config.ts`: Test-specific configurations
+- `tests/test_task.json`: Sample task configurations
 
 ## Running Tests
 
-To run the tests:
-
+### All Tests
 ```bash
-python -m tests.e2e
+# Run all tests
+npm test
+
+# Run with coverage
+npm run test:coverage
 ```
 
-To force reset databases before running:
-
+### Specific Test Suites
 ```bash
-python -m tests.e2e --reset
+# Run integration tests
+vitest integration
+
+# Run specific test file
+vitest tests/main.test.ts
+
+# Run tests matching a pattern
+vitest -t "task processing"
 ```
 
-## Test Flow
+## Test Categories
 
-1. API Key Validation
+### 1. Unit Tests
+Located in individual test files, testing specific functions and utilities.
 
-   - Validates Anthropic API key
+Example test file structure:
+```typescript
+import { describe, it, expect } from 'vitest'
+import { functionToTest } from '../src/utils'
 
-2. GitHub Validation
+describe('Utility Function', () => {
+  it('should handle basic scenario', () => {
+    const result = functionToTest(input)
+    expect(result).toBe(expectedOutput)
+  })
+})
+```
 
-   - Validates GitHub credentials
+### 2. Integration Tests
+Validate interactions between components.
 
-3. Todo Management
+### 3. Workflow Simulation
+End-to-end task processing tests in `tests/stages/`.
 
-   - Fetches todos for each worker
-   - Generates summaries
-   - Submits results
+## Test Data and Mocking
 
-4. Audit Process
-   - Workers audit each other's submissions
+### Mocking Strategies
+- Use `vitest` built-in mocking
+- Mock external services
+- Provide deterministic test data
 
-## Adding New Tests
+### Test Data Sources
+- `tests/test_task.json`: Sample task configurations
+- `tests/simulateTask.ts`: Task simulation utilities
 
-1. Create a new stage in `stages/`
-2. Add stage to `stages/__init__.py`
-3. Add test step in `steps.py`
-4. Update test data in `data/` if needed
+## Performance and Coverage
+
+### Coverage Reports
+```bash
+npm run test:coverage
+```
+
+### Performance Testing
+- Use Vitest's built-in benchmarking
+- Measure critical path performance
+
+## Debugging Tests
+- Use `vitest --inspect-brk` for debugging
+- Enable verbose logging with `-v`
+
+## Continuous Integration
+- Automated test runs on every PR
+- Minimum coverage threshold: 85%
+
+## Best Practices
+- Write tests before implementing features
+- Keep tests independent
+- Use descriptive test names
+- Mock external dependencies
+- Test both happy and error paths
+
+## Troubleshooting
+- Ensure Node.js and npm are up to date
+- Clear npm cache if dependency issues occur
+- Check TypeScript and Vitest configurations
+
+## Contributing
+1. Add tests for new features
+2. Maintain or improve test coverage
+3. Document test cases thoroughly
