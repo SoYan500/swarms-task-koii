@@ -1,118 +1,124 @@
-# 247 Builder
+# Orca Agent Setup and Testing Guide
 
-## Developing locally
+## Local Development Setup
 
-Navigate to the correct directory:
+### Prerequisites
+- Python 3.8+
+- pip
+- Optional: virtualenv or conda
 
-```sh
-cd builder/container
+### Environment Setup
+
+1. Clone the repository
+```bash
+git clone <repository_url>
+cd node/orca-agent
 ```
 
-Set up a virtual environment and activate it:
-
-```sh
+2. Create Virtual Environment
+```bash
+# Using venv
 python3 -m venv .venv
 source .venv/bin/activate
+
+# Or using conda
+conda create -n orca-agent python=3.8
+conda activate orca-agent
 ```
 
-Install dependencies:
-
-```sh
+3. Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-Run tests:
+## Testing
 
-```sh
-python3 -m pytest tests/
-```
+### Test Suite Overview
+Our test suite covers:
+- Unit Tests
+- Integration Tests
+- E2E Tests
+- API Tests
 
-Run the agent:
+### Running Tests
 
-```sh
-python3 main.py
-```
-
-## Developing in Docker
-
-### Running the Flask Server
-
-Navigate to the correct directory:
-
-```sh
-cd builder/container
-```
-
-Build the image:
-
-```sh
-docker build -t builder247 .
-```
-
-Run the container:
-
-```sh
-docker run builder247
-```
-
-You can also run with a mounted volume if you'd like to change files without updating the container:
-
-```sh
-docker run -v $(pwd):/app builder247
-```
-
-### Running Interactively (using the shell)
-
-Navigate to the correct directory:
-
-```sh
-cd builder/container
-```
-
-Change this line in the Dockerfile:
-
-```sh
-CMD ["python", "main.py"]
-```
-
-to
-
-```sh
-CMD ["/bin/bash"]
-```
-
-Build the image:
-
-```sh
-docker build -t builder247.
-```
-
-Run the container with a mounted volume:
-
-```sh
-docker run -it -v $(pwd)/builder:/app builder247
-```
-
-This will give you access to your files within the container and run the container in interactive mode with shell access. You can then run tests inside the container using:
-
-```sh
+#### All Tests
+```bash
+# Run all tests
 python -m pytest tests/
+
+# Run with verbose output
+python -m pytest -v tests/
 ```
 
-or
+#### Specific Test Types
+```bash
+# Unit Tests
+python -m pytest tests/ -k "not integration and not e2e"
 
-```sh
-python3 -m pytest tests/
+# Integration Tests
+python -m pytest tests/ -k "integration"
+
+# E2E Tests
+python -m pytest tests/ -k "e2e"
 ```
 
-You can also run the flask server in the container with:
-
-```sh
-python main.py
+### Test Coverage
+```bash
+# Generate coverage report
+pip install coverage
+coverage run -m pytest tests/
+coverage report -m
+coverage html  # Generate HTML report
 ```
 
-To exit the container's shell:
+### Test Configuration
+- pytest is the primary test runner
+- Configuration in `tests/config.yaml`
+- Uses `conftest.py` for shared fixtures
 
-```sh
-exit
+### Specific Test Scenarios
+```bash
+# Test database operations
+python -m pytest tests/test_db_operations.py
+
+# Test logging
+python -m pytest tests/test_logging.py
+
+# Test middle server interactions
+python -m pytest tests/test_middle_server.py
 ```
+
+## Environment Variables for Testing
+Create a `.env.test` file:
+```
+# Test-specific environment configurations
+TEST_MONGODB_URI=mongodb://localhost:27017/orca-test
+TEST_API_KEY=your_test_api_key
+GITHUB_TEST_TOKEN=your_github_test_token
+```
+
+## Best Practices
+- Always run tests before committing
+- Write tests for new features
+- Cover edge cases
+- Mock external services
+- Keep tests independent
+
+## Troubleshooting
+- Verify Python version compatibility
+- Check network connectivity
+- Ensure all dependencies are installed
+- Use `-v` or `-vv` for verbose output
+
+## Continuous Integration
+Tests are automatically run on:
+- Pull Requests
+- Main branch commits
+- Scheduled intervals
+
+## Contributing
+- Follow PEP8 guidelines
+- Write clear test cases
+- Document test utilities
+- Maintain high test coverage

@@ -1,160 +1,114 @@
 # Middle Server for Swarm Task Processing
 
-This server acts as a middleware for processing swarm tasks, managing job status, and storing results.
-
-## Recent Updates
-- Only Swarm APIs are supported; all legacy endpoints have been removed.
-- Test scripts in `deprecated_unit_tests/` demonstrate usage of the new Swarm APIs.
-- Comprehensive API documentation and data models are provided below.
+## Overview
+A middleware server for processing swarm tasks, managing job status, and storing results.
 
 ## Features
-
 - Swarm job creation and management
 - Status tracking and updates
 - Result storage and retrieval
-- MongoDB integration for data persistence
+- MongoDB integration
 - RESTful API endpoints
 - Comprehensive test coverage
 
-## API Endpoints
+## Setup and Installation
 
-### Swarm Jobs
+### Prerequisites
+- Node.js (v16+)
+- MongoDB
+- npm or yarn
 
-- `POST /api/swarm/jobs` - Create a new swarm job
-  - Request body: `{ swarm_spec: SwarmSpec, metadata?: Record<string, any> }`
-  - Response: `{ job_id: string, status: string, swarm_spec: SwarmSpec, ... }`
-
-- `GET /api/swarm/jobs/:jobId` - Get job details
-  - Response: `{ job_id: string, status: string, swarm_spec: SwarmSpec, ... }`
-
-- `PUT /api/swarm/jobs/:jobId/status` - Update job status
-  - Request body: `{ status: string, progress?: number, error?: string }`
-  - Response: `{ job_id: string, status: string, progress?: number, ... }`
-
-- `POST /api/swarm/jobs/:jobId/result` - Store job result
-  - Request body: `{ output: any, metadata?: Record<string, any> }`
-  - Response: `{ job_id: string, status: string, output: any, ... }`
-
-- `GET /api/swarm/jobs/:jobId/result` - Get job result
-  - Response: `{ job_id: string, output: any, metadata?: Record<string, any>, ... }`
-
-## Data Models
-
-### SwarmSpec
-
-```typescript
-interface SwarmSpec {
-  name: string;
-  description: string;
-  agents: AgentSpec[];
-  max_loops: number;
-  swarm_type: string;
-  task: string;
-  schedule?: ScheduleSpec;
-}
-```
-
-### AgentSpec
-
-```typescript
-interface AgentSpec {
-  agent_name: string;
-  description: string;
-  model_name: string;
-  max_tokens: number;
-  temperature?: number;
-  top_p?: number;
-  system_prompt?: string;
-}
-```
-
-### ScheduleSpec
-
-```typescript
-interface ScheduleSpec {
-  type: "sequential" | "parallel";
-  max_parallel?: number;
-}
-```
-
-## Quick Start
-
-For a quick start with a sample job, use the provided script:
-
+### Installation
 ```bash
-./scripts/start-and-test.sh
+# Install dependencies
+npm install
+# or
+yarn install
 ```
 
-This script will:
-1. Start the server in development mode
-2. Create a sample swarm job
-3. Display the job details
-4. Keep the server running until you press Ctrl+C
+## Configuration
 
-## Setup
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Set environment variables:
-   ```bash
-   MONGODB_URI=mongodb://localhost:27017/middle-server
-   PORT=3000
-   ```
-
-3. Start the server:
-   ```bash
-   npm run dev
-   ```
+### Environment Variables
+Create a `.env` file with the following configurations:
+```
+MONGODB_URI=mongodb://localhost:27017/middle-server
+PORT=3000
+ADMIN_KEY=your_secret_admin_key
+```
 
 ## Testing
 
-Run tests:
+### Test Suite Overview
+Our test suite covers multiple aspects of the middle server:
+- Unit Tests
+- Integration Tests
+- API Endpoint Tests
+- Error Handling Tests
+
+### Running Tests
+
+#### All Tests
 ```bash
 npm test
+# or
+yarn test
 ```
 
-## Development
+#### Specific Test Types
+```bash
+# Unit Tests
+npm run test:unit
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run linter
+# Integration Tests
+npm run test:integration
 
-## Test Scripts
+# API Endpoint Tests
+npm run test:api
+```
 
-See `deprecated_unit_tests/` for migration and legacy test scripts using the new Swarm APIs.
+### Test Coverage
+```bash
+npm run test:coverage
+# Generates detailed coverage report
+```
 
-## Live Unit Tests
+### Live Unit Tests
+Located in `live_unit_tests/`, these scripts test against a running server instance:
 
-The `live_unit_tests/` directory contains scripts that exercise the Swarm APIs against a running instance of the middle server. These scripts are intended for manual or integration testing with a live backend (not as part of the automated Jest suite).
+```bash
+# Start the server
+npm run dev
 
-### How to Use
+# In another terminal, run live tests
+npx ts-node live_unit_tests/controllers/createToDoTest.ts
+npx ts-node live_unit_tests/controllers/createFetchAddPRTest.ts
+```
 
-1. **Start the middle server** (in a separate terminal):
-   ```bash
-   npm run dev
-   ```
+### Test Configuration
+- Jest is used as the primary test runner
+- Configuration in `jest.config.js`
+- TypeScript support via `ts-jest`
 
-2. **Run a live test script** (in another terminal):
-   ```bash
-   npx ts-node live_unit_tests/controllers/createToDoTest.ts
-   npx ts-node live_unit_tests/controllers/createFetchAddPRTest.ts
-   npx ts-node live_unit_tests/utils/signTest.ts
-   ```
+## Best Practices
+- Always run tests before committing
+- Aim for 90%+ test coverage
+- Test edge cases and error scenarios
+- Keep tests independent and idempotent
 
-These scripts will make real HTTP requests to the server and print results to the console. They are useful for verifying end-to-end functionality and API compatibility after changes.
+## Troubleshooting
+- Verify MongoDB connection
+- Check environment variables
+- Ensure all dependencies are installed
+- Use verbose mode for detailed error messages
 
-## Error Response Conventions
+## Development Commands
+- `npm run dev`: Start development server
+- `npm run build`: Compile TypeScript
+- `npm run test`: Run test suite
+- `npm run lint`: Check code quality
 
-- **Authentication errors** (invalid or missing admin key):
-  - Status codes: `401` (missing), `403` (invalid)
-  - Response body: `{ "message": "..." }`
-
-- **Validation errors** (invalid job spec):
-  - Status code: `400`
-  - Response body: `{ "error": "..." }`
-
-These conventions are enforced and tested in the API test suite. 
+## Contributing
+- Follow existing test structure
+- Write clear, concise test cases
+- Document new test utilities
+- Maintain code coverage

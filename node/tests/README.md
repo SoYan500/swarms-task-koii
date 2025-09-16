@@ -1,73 +1,86 @@
-# Summarizer Task Tests
+# Node Tests Documentation
 
-This directory contains end-to-end tests for the summarizer task using the Prometheus test framework.
+## Overview
+This directory contains comprehensive test suites for the Node component, covering various aspects of the system including task processing, submissions, and auditing.
 
-## Structure
-
+## Test Structure
 ```
 tests/
-├── config.yaml           # Test configuration
-├── workers.json         # Worker configuration
-├── data/               # Test data
-│   ├── todos.json     # Sample todo items
-│   └── issues.json    # Sample issues
-├── stages/            # Test stages implementation
-├── e2e.py            # Test runner script
-└── steps.py          # Test steps definition
+├── config.ts           # Test configuration
+├── debugger.ts         # Debugging utilities
+├── main.test.ts        # Primary test suite
+├── node-worker.test.ts # Node worker specific tests
+└── integration.test.ts # Integration test suite
 ```
 
 ## Prerequisites
+- Node.js (v16+ recommended)
+- TypeScript
+- npm or yarn
 
-1. Install the test framework:
+## Setup
 
+1. Install dependencies:
 ```bash
-pip install -e test-framework/
+npm install
+# or
+yarn install
 ```
 
-2. Set up environment variables in `.env`:
-
+2. Configure Environment
+Create a `.env` file in the project root with the following variables:
 ```
-ANTHROPIC_API_KEY=your_test_key
-GITHUB_USERNAME=your_test_username
-GITHUB_TOKEN=your_test_token
+# Add necessary environment variables
+GITHUB_TOKEN=your_github_token
+ANTHROPIC_API_KEY=your_anthropic_api_key
 ```
 
 ## Running Tests
 
-To run the tests:
-
+### Run All Tests
 ```bash
-python -m tests.e2e
+npm test
+# or
+yarn test
 ```
 
-To force reset databases before running:
-
+### Run Specific Test Suites
 ```bash
-python -m tests.e2e --reset
+# Run main test suite
+npm run test:main
+
+# Run node worker tests
+npm run test:workers
+
+# Run integration tests
+npm run test:integration
 ```
 
-## Test Flow
+### Test Configuration Options
+Edit `tests/config.ts` to customize test parameters and environment settings.
 
-1. API Key Validation
+## Test Coverage
+```bash
+npm run test:coverage
+# Generates detailed coverage report
+```
 
-   - Validates Anthropic API key
+## Debugging
+Use `tests/debugger.ts` for advanced debugging and test scenario generation.
 
-2. GitHub Validation
+## Best Practices
+- Always run tests before committing changes
+- Ensure 100% test coverage for critical paths
+- Update tests when adding new features
 
-   - Validates GitHub credentials
+## Troubleshooting
+- Verify environment variables
+- Check network connectivity
+- Ensure all dependencies are installed
+- Use verbose mode for detailed error messages
 
-3. Todo Management
-
-   - Fetches todos for each worker
-   - Generates summaries
-   - Submits results
-
-4. Audit Process
-   - Workers audit each other's submissions
-
-## Adding New Tests
-
-1. Create a new stage in `stages/`
-2. Add stage to `stages/__init__.py`
-3. Add test step in `steps.py`
-4. Update test data in `data/` if needed
+## Contributing
+- Write clear, concise test cases
+- Cover edge cases and error scenarios
+- Maintain existing test structure
+- Document any new test utilities
